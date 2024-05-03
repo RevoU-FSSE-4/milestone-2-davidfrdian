@@ -1,11 +1,12 @@
 # Pokemon App
 
-Pokemon App is a simple web application built with React that displays and search a Pokemon fetched from the [PokeAPI](https://pokeapi.co/).
+Pokemon App is a simple web application built with React that displays and searches for Pokémon fetched from the [PokeAPI](https://pokeapi.co/).
 
 ## Features
 
-- Display a list of Pokemon with their names and images.
-- Search for a specific Pokemon by name.
+- Display a list of Pokémon with their names and images.
+- Search for a specific Pokémon by name.
+- Save favorite Pokémon to a favorites list.
 - Use React Router for navigation between different pages.
 
 ## Technologies Used
@@ -19,5 +20,10 @@ Pokemon App is a simple web application built with React that displays and searc
 
 Clone the repository:
 
-   ```bash
+   ```
    git clone https://github.com/RevoU-FSSE-4/milestone-2-davidfrdian.git
+   ```
+
+### Author
+You can reach me on social media [Instagram](https://www.instagram.com/david_f.h/) and [LinkedIn](https://www.linkedin.com/in/davidferdian/)😊🙌
+
