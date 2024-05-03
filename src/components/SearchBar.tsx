@@ -25,6 +25,7 @@ const SearchBar = () => {
   });
   const [isFavorite, setIsFavorite] = useState(false); 
   const [favoritePokemon, setFavoritePokemon] = useState<Pokemon[]>([]); 
+  const [isLoading, setIsLoading] = useState(false); 
 
   useEffect(() => {
     const favoritePokemonData = JSON.parse(localStorage.getItem("favoritePokemon") || "[]") as Pokemon[];
@@ -41,6 +42,7 @@ const SearchBar = () => {
   
 
   const searchPokemon = async () => {
+    setIsLoading(true); 
     try {
       const response = await axios.get(
         `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
@@ -61,6 +63,8 @@ const SearchBar = () => {
     } catch (error) {
       console.error("Error fetching Pokemon data:", error);
       alert(`Pokemon with name "${pokemonName}" doesn't exist.`);
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -112,6 +116,11 @@ const SearchBar = () => {
         </button>
       </div>
       <div>
+      {isLoading && (
+          <div className="flex justify-center items-center h-screen">
+            <div className="animate-spin rounded-full h-20 w-20 border-t-2 border-b-2 border-gray-900"></div>
+          </div>
+        )}
         {!pokemonChosen ? (
           <h1 className="text-3xl font-semibold">Please choose a Pokemon</h1>
         ) : (
@@ -154,6 +163,7 @@ const SearchBar = () => {
             </div>
           </>
         )}
+
       </div>
     </>
   );
