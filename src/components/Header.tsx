@@ -8,12 +8,15 @@ function Header() {
           Pokemon Stats
         </h1>
         <nav className="my-4">
-          <ul className="flex justify-center gap-10">
-            <li className="bg-emerald-200 font-semibold py-2 px-2 rounded-lg hover:text-slate-100 hover:bg-green-900 duration-200 shadow-lg w-32">
+          <ul className="flex items-center justify-center  gap-10">
+            <li className=" bg-emerald-200 font-semibold py-2 px-2 rounded-lg hover:text-slate-100 hover:bg-green-900 duration-200 shadow-lg w-32 ">
               <Link to="/">Search</Link>
             </li>
             <li className="bg-emerald-200 font-semibold py-2 px-2 rounded-lg hover:text-slate-100 hover:bg-green-900 duration-200 shadow-lg w-32">
-              <Link to="/list">Pokemon List</Link>
+              <Link to="/list">List</Link>
+            </li>
+            <li className="bg-emerald-200 font-semibold py-2 px-2 rounded-lg hover:text-slate-100 hover:bg-green-900 duration-200 shadow-lg w-32">
+              <Link to="/favorite">Favorite</Link>
             </li>
           </ul>
         </nav>

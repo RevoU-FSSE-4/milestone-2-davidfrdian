@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+
+interface Pokemon {
+  name: string;
+  species: string;
+  img: string;
+  hp: string;
+  attack: string;
+  defense: string;
+  type: string;
+}
 
 const SearchBar = () => {
   const [pokemonName, setPokemonName] = useState("");
   const [pokemonChosen, setPokemonChosen] = useState(false);
-  const [pokemon, setPokemon] = useState({
+  const [pokemon, setPokemon] = useState<Pokemon>({
     name: "",
     species: "",
     img: "",
@@ -13,13 +23,29 @@ const SearchBar = () => {
     defense: "",
     type: "",
   });
+  const [isFavorite, setIsFavorite] = useState(false); 
+  const [favoritePokemon, setFavoritePokemon] = useState<Pokemon[]>([]); 
+
+  useEffect(() => {
+    const favoritePokemonData = JSON.parse(localStorage.getItem("favoritePokemon") || "[]") as Pokemon[];
+    setFavoritePokemon(favoritePokemonData);
+  
+    const searchedPokemonData = JSON.parse(localStorage.getItem("searchedPokemon") || "{}") as Pokemon;
+    if (searchedPokemonData.name) {
+      setPokemon(searchedPokemonData);
+      setPokemonChosen(true);
+      const isPokemonInFavorites = favoritePokemon.some(p => p.name === searchedPokemonData.name);
+      setIsFavorite(isPokemonInFavorites);
+    }
+  }, [favoritePokemon]); 
+  
 
   const searchPokemon = async () => {
     try {
       const response = await axios.get(
         `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
       );
-      setPokemon({
+      const pokemonData: Pokemon = {
         name: pokemonName,
         species: response.data.species.name,
         img: response.data.sprites.front_default,
@@ -27,18 +53,40 @@ const SearchBar = () => {
         attack: response.data.stats[1].base_stat,
         defense: response.data.stats[2].base_stat,
         type: response.data.types[0].type.name,
-      });
+      };
       setPokemonChosen(true);
+      setPokemon(pokemonData);
+      setIsFavorite(favoritePokemon.some(p => p.name === pokemonName)); // Update favorite status
+      localStorage.setItem("searchedPokemon", JSON.stringify(pokemonData)); // Save searched Pokémon data
     } catch (error) {
       console.error("Error fetching Pokemon data:", error);
       alert(`Pokemon with name "${pokemonName}" doesn't exist.`);
     }
   };
 
-  const handleKeyPress = (event: any) => {
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
       searchPokemon();
+    }
+  };
+
+  const toggleFavorite = () => {
+    const favoritePokemonUpdated = [...favoritePokemon];
+    const isPokemonInFavorites = favoritePokemon.some(p => p.name === pokemon.name);
+
+    if (!isPokemonInFavorites) {
+      setIsFavorite(true);
+      localStorage.setItem(
+        "favoritePokemon",
+        JSON.stringify([...favoritePokemonUpdated, pokemon])
+      );
+      setFavoritePokemon([...favoritePokemonUpdated, pokemon]);
+    } else {
+      setIsFavorite(false);
+      const updatedFavorites = favoritePokemonUpdated.filter(p => p.name !== pokemon.name);
+      localStorage.setItem("favoritePokemon", JSON.stringify(updatedFavorites));
+      setFavoritePokemon(updatedFavorites);
     }
   };
 
@@ -65,9 +113,7 @@ const SearchBar = () => {
       </div>
       <div>
         {!pokemonChosen ? (
-          <h1 className="text-3xl font-semibold">
-            Please choose a Pokemon
-          </h1>
+          <h1 className="text-3xl font-semibold">Please choose a Pokemon</h1>
         ) : (
           <>
             <h1 className="text-3xl mt-12 uppercase font-semibold">
@@ -83,10 +129,27 @@ const SearchBar = () => {
                 <h3 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm capitalize">
                   Species: {pokemon.species}
                 </h3>
-                <h3 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm capitalize">Type: {pokemon.type}</h3>
-                <h4 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm">Hp: {pokemon.hp}</h4>
-                <h4 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm">Attack: {pokemon.attack}</h4>
-                <h4 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-16 text-left text-sm">Defense: {pokemon.defense}</h4>
+                <h3 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm capitalize">
+                  Type: {pokemon.type}
+                </h3>
+                <h4 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm">
+                  Hp: {pokemon.hp}
+                </h4>
+                <h4 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-2 text-left text-sm">
+                  Attack: {pokemon.attack}
+                </h4>
+                <h4 className="bg-green-600 text-white font-bold p-1 pl-3 rounded-lg w-48 mb-16 text-left text-sm">
+                  Defense: {pokemon.defense}
+                </h4>
+                <button
+                  onClick={toggleFavorite}
+                  disabled={isFavorite}
+                  className={`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md mb-20 ${
+                    isFavorite && "opacity-50 cursor-not-allowed"
+                  }`}
+                >
+                  {isFavorite ? "Already in Favorites" : "Add to Favorites"}
+                </button>
               </div>
             </div>
           </>
