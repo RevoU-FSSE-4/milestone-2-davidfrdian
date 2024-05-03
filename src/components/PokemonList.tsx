@@ -12,14 +12,24 @@ const PokemonList: React.FC = () => {
   useEffect(() => {
     const fetchPokemonList = async () => {
       try {
-        const response = await axios.get("https://pokeapi.co/api/v2/pokemon");
-        const data: Pokemon[] = response.data.results.map(
-          (pokemon: Pokemon) => ({
-            ...pokemon,
-            name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
-          })
-        );
-        setPokemonList(data);
+        let allPokemon: Pokemon[] = [];
+        let nextUrl = "https://pokeapi.co/api/v2/pokemon";
+
+        // Loop through each page until there's no more "next" URL or until you reach a maximum number of pages
+        while (nextUrl && allPokemon.length < 1000) { // Example: fetching up to 1000 pokemon
+          const response = await axios.get(nextUrl);
+          const data: Pokemon[] = response.data.results.map(
+            (pokemon: Pokemon) => ({
+              ...pokemon,
+              name: pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1),
+            })
+          );
+
+          allPokemon = [...allPokemon, ...data];
+          nextUrl = response.data.next; // Get the next page URL
+        }
+
+        setPokemonList(allPokemon);
       } catch (error) {
         console.error("Error fetching Pokemon:", error);
       }
